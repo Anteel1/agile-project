@@ -3,7 +3,6 @@ import { UsersAPIController } from './controller/users.api.controller';
 import { UsersService } from './services/users.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User } from './models/user.model';
-import { UsersController } from './controller/users.controller';
 import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from './jwtConstants.secret';
 import { AuthGuard } from './guard/auth.guard';
@@ -33,7 +32,7 @@ import { CloudinaryModule } from 'src/config/cloudinary/cloudinary.module';
   }),
     CloudinaryModule
   ],
-  controllers: [UsersController, UsersAPIController],
+  controllers: [UsersAPIController],
   providers: [UsersService]
 })
 export class UsersModule { }
