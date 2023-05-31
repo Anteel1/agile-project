@@ -11,6 +11,7 @@ export class CloudinaryService {
             const uploadStream = cloudinary.uploader.upload_stream(
                 (error, result) => {
                     if (error) return reject(error);
+                    console.log(result)
                     resolve(result);
                 },
             );

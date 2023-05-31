@@ -5,8 +5,6 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { User } from './models/user.model';
 import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from './jwtConstants.secret';
-import { AuthGuard } from './guard/auth.guard';
-import { APP_GUARD } from '@nestjs/core';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { CloudinaryModule } from 'src/config/cloudinary/cloudinary.module';
 @Module({

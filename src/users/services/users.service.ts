@@ -1,5 +1,5 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { createUserDto, signinUserDto } from '../dto/user.dto';
+import { HttpException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { createUserDto, editVerifyCode, signinUserDto } from '../dto/user.dto';
 import { UserType } from '../models/user.model';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
@@ -22,8 +22,10 @@ export class UsersService {
 
     async createUser(user: createUserDto) {
         try {
-            const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-            const verifyCode = characters.charAt(Math.floor(Math.random() * 1000000));
+            const crypto = require('crypto')
+            const randomEightDigits = crypto.randomBytes(4).readUInt32BE(0).toString().slice(0, 4)
+            const verifyCode = randomEightDigits
+            console.log(verifyCode)
             const salt = await bcrypt.genSalt(10)
             const hashPassword = await bcrypt.hash(user.password, salt)
             const newUser = new this.model({
@@ -37,6 +39,7 @@ export class UsersService {
             })
             this.sendVerify(user.email, verifyCode)
             return await newUser.save()
+            return verifyCode
         } catch (error) {
             throw new AuthenticatorResponse
         }
@@ -44,15 +47,18 @@ export class UsersService {
 
     async signIn(user: signinUserDto) {
         const result = await this.model.findOne({ username: user.username })
-        const isPassword = await bcrypt.compare(user.password, result.password)
-        if (isPassword) {
-            const payload = { username: result.username, sub: result._id };
-            return {
-                access_token: await this.jwtService.signAsync(payload),
-                result: result
-            };
+        if (!result.verifyCode) {
+            const isPassword = await bcrypt.compare(user.password, result.password)
+            if (isPassword) {
+                const payload = { username: result.username, sub: result._id };
+                return {
+                    access_token: await this.jwtService.signAsync(payload),
+                    result: result
+                };
+            }
+            throw new UnauthorizedException();
         }
-        throw new UnauthorizedException();
+        throw new HttpException('This user is not verify !!!', 409)
     }
 
 
@@ -61,7 +67,7 @@ export class UsersService {
     }
 
     async editUser(_id: string, user: createUserDto) {
-        return await this.model.findOneAndUpdate({ sid: _id }, user)
+        return await this.model.findOneAndUpdate({ _id: _id }, user)
     }
 
     async deleteUser(_id: string) {
@@ -81,6 +87,10 @@ export class UsersService {
 
     async verifyUser(_id: string, verifyCode: string) {
         const user = await this.model.findOne({ _id: _id })
-        return verifyCode === user.verifyCode
+        if (verifyCode === user.verifyCode) {
+            user.verifyCode = ""
+            return await this.model.findOneAndUpdate({ _id: _id }, user)
+        }
+        return false
     }
 }
