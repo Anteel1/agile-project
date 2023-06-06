@@ -99,21 +99,16 @@ export class UsersAPIController {
 
     @ApiBody({ type: [updateUserDto] })
     @Post(':id/edit')
-    @UseInterceptors(FileInterceptor('file'))
     @UseGuards(AuthGuard)
     async editUser(@Req() req: Request, @Res() res: Response, @Next() next: NextFunction,
-        @Param('id') id: string, @UploadedFile() file: Express.Multer.File
+        @Param('id') id: string, @Body() user: updateUserDto,
     ) {
         try {
-            const avatar = await this.cloudinaryService.uploadFile(file)
-            console.log(avatar.url)
-            return avatar
-            // user.avatar = avatar.url
-            // const result = await this.usersService.editUser(String(id), user)
-            // if (result) {
-            //     return res.status(HttpStatus.OK).json({ statusCode: 200, data: result })
-            // }
-            // return res.status(HttpStatus.BAD_REQUEST).json({ statusCode: 409, message: 'Error' })
+            const result = await this.usersService.editUser(String(id), user)
+            if (result) {
+                return res.status(HttpStatus.OK).json({ statusCode: 200, data: result })
+            }
+            return res.status(HttpStatus.BAD_REQUEST).json({ statusCode: 409, message: 'Error' })
         } catch (error) {
             next(error)
         }

@@ -1,5 +1,5 @@
 import { HttpException, Injectable, UnauthorizedException } from '@nestjs/common';
-import { createUserDto, editVerifyCode, signinUserDto } from '../dto/user.dto';
+import { createUserDto, editVerifyCode, signinUserDto, updateUserDto } from '../dto/user.dto';
 import { UserType } from '../models/user.model';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
@@ -66,8 +66,8 @@ export class UsersService {
         return await this.model.findOne({ _id: id })
     }
 
-    async editUser(_id: string, user: createUserDto) {
-        return await this.model.findOneAndUpdate({ _id: _id }, user)
+    async editUser(_id: string, user: updateUserDto) {
+        return await this.model.findOneAndUpdate({ _id: _id }, user, { new: true })
     }
 
     async deleteUser(_id: string) {

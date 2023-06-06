@@ -26,23 +26,13 @@ export class createUserDto {
 
 export class updateUserDto {
     @ApiProperty()
-    @IsNotEmpty()
-    @Length(4, 16)
-    username: string;
-
-    @ApiProperty()
-    @IsNotEmpty()
-    @Length(6, 12)
-    password: string;
-
-    @ApiProperty()
     phone: string;
 
     @ApiProperty()
     email: string;
 
     @ApiProperty()
-    file: string;
+    avatar: string;
 
     @ApiProperty()
     @IsNotEmpty()
