@@ -5,9 +5,10 @@ import { UsersModule } from './users/users.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { CloudinaryModule } from './config/cloudinary/cloudinary.module';
 import { CategoriesModule } from './categories/categories.module';
+import { ProductsModule } from './product/products.module';
 
 @Module({
-  imports: [UsersModule, CategoriesModule,
+  imports: [UsersModule, CategoriesModule, ProductsModule,
     MongooseModule.forRoot('mongodb+srv://luonglkvn100:10l10l10L@demomongodb.rshjmd0.mongodb.net/demoNestjs?retryWrites=true&w=majority'
       , {
         useNewUrlParser: true,

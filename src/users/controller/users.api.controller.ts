@@ -6,15 +6,14 @@ import { AuthGuard } from '../guard/auth.guard';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
 import { CloudinaryService } from 'src/config/cloudinary/cloudinary.service';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { PortalController } from 'src/decorator/decor.controller';
 
-@ApiTags('user')
-@Controller('api/user/')
+@PortalController({ path: 'user', version: "2" })
 export class UsersAPIController {
     constructor(
         private readonly usersService: UsersService,
         private readonly cloudinaryService: CloudinaryService) { }
 
-    @ApiBody({})
     @Get("getall")
     @UseGuards(AuthGuard)
     async getAllUser(@Req() req: Request, @Res() res: Response, @Next() next: NextFunction): Promise<any> {
@@ -29,8 +28,6 @@ export class UsersAPIController {
         }
 
     }
-
-    @ApiBody({ type: [createUserDto] })
     @UsePipes(new ValidationPipe())
     @Post("signup")
     async createUser(@Req() req: Request, @Res() res: Response, @Next() next: NextFunction, @Body() user: createUserDto) {
@@ -47,8 +44,6 @@ export class UsersAPIController {
             next(error)
         }
     }
-
-    @ApiBody({ type: [verifyUser] })
     @Post('verify')
     async verifyUser(@Req() req: Request, @Res() res: Response, @Next() next: NextFunction, @Body() verifyUser: verifyUser) {
         try {
@@ -61,8 +56,6 @@ export class UsersAPIController {
             next(error)
         }
     }
-
-    @ApiBody({ type: [signinUserDto] })
     @UsePipes(new ValidationPipe())
     @Post("signin")
     async signIn(@Req() req: Request, @Res() res: Response, @Next() next: NextFunction, @Body() user: signinUserDto) {
@@ -96,8 +89,6 @@ export class UsersAPIController {
             next(error)
         }
     }
-
-    @ApiBody({ type: [updateUserDto] })
     @Post(':id/edit')
     @UseGuards(AuthGuard)
     async editUser(@Req() req: Request, @Res() res: Response, @Next() next: NextFunction,

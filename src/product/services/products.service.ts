@@ -1,23 +1,23 @@
 import { BadRequestException, Injectable, UnauthorizedException } from '@nestjs/common';
-import { CategoryType } from '../models/category.model';
+import { ProductType } from '../models/product.model';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import { CategoryDto } from '../dto/category.dto';
+import { ProductDto } from '../dto/product.dto';
 
 @Injectable()
-export class CategoriesService {
+export class ProductsService {
     constructor(
-        @InjectModel('Category')
-        private readonly model: Model<CategoryType>) { }
+        @InjectModel('Product')
+        private readonly model: Model<ProductType>) { }
 
 
     async getAll() {
         return await this.model.find({})
     }
 
-    async create(category: CategoryDto) {
+    async create(product: ProductDto) {
         try {
-            const newCate = new this.model(category)
+            const newCate = new this.model(product)
             return await newCate.save()
         } catch (error) {
             throw new BadRequestException
@@ -28,8 +28,8 @@ export class CategoriesService {
         return await this.model.findOne({ _id: id })
     }
 
-    async edit(_id: string, category: CategoryDto) {
-        return await this.model.findOneAndUpdate({ _id: _id }, category, { new: true })
+    async edit(_id: string, product: ProductDto) {
+        return await this.model.findOneAndUpdate({ _id: _id }, product, { new: true })
     }
 
     async delete(_id: string) {

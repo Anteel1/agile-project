@@ -4,21 +4,21 @@ import { AuthGuard } from 'src/users/guard/auth.guard';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
 import { CloudinaryService } from 'src/config/cloudinary/cloudinary.service';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { CategoriesService } from '../services/categories.service';
-import { CategoryDto } from '../dto/category.dto';
+import { ProductsService } from '../services/products.service';
+import { ProductDto } from '../dto/product.dto';
 import { PortalController } from 'src/decorator/decor.controller';
 
-@PortalController({ path: 'category' })
-export class CategoriesAPIController {
+@PortalController({ path: 'product' })
+export class ProductAPIController {
     constructor(
-        private readonly categoryService: CategoriesService,
+        private readonly productService: ProductsService,
         private readonly cloudinaryService: CloudinaryService) { }
 
     @Get("getall")
     @UseGuards(AuthGuard)
     async getAllUser(@Req() req: Request, @Res() res: Response, @Next() next: NextFunction): Promise<any> {
         try {
-            const result = await this.categoryService.getAll()
+            const result = await this.productService.getAll()
             if (result) {
                 return res.status(HttpStatus.OK).json({ statusCode: 200, data: result })
             }
@@ -33,7 +33,7 @@ export class CategoriesAPIController {
     @UseGuards(AuthGuard)
     async getCategoryById(@Req() req: Request, @Res() res: Response, @Next() next: NextFunction, @Param('id') id: string) {
         try {
-            const result = await this.categoryService.getById(String(id))
+            const result = await this.productService.getById(String(id))
             if (result) {
                 return res.status(HttpStatus.OK).json({ statusCode: 200, data: result })
             }
@@ -46,10 +46,10 @@ export class CategoriesAPIController {
     @Post('create')
     @UseGuards(AuthGuard)
     async createCategory(@Req() req: Request, @Res() res: Response, @Next() next: NextFunction,
-        @Body() category: CategoryDto
+        @Body() product: ProductDto
     ) {
         try {
-            const result = await this.categoryService.create(category)
+            const result = await this.productService.create(product)
             if (result) {
                 return res.status(HttpStatus.OK).json({ statusCode: 200, data: result })
             }
@@ -61,12 +61,16 @@ export class CategoriesAPIController {
 
 
     @Post(':id/edit')
+    @UseInterceptors(FileInterceptor('file'))
     @UseGuards(AuthGuard)
     async editUser(@Req() req: Request, @Res() res: Response, @Next() next: NextFunction,
-        @Param('id') id: string, @Body() category: CategoryDto
+        @Param('id') id: string, @Body() product: ProductDto, @UploadedFile() file: Express.Multer.File
     ) {
         try {
-            const result = await this.categoryService.edit(id, category)
+            const img = await this.cloudinaryService.uploadFile(file)
+            console.log(img.url)
+            product.img = img.url
+            const result = await this.productService.edit(String(id), product)
             if (result) {
                 return res.status(HttpStatus.OK).json({ statusCode: 200, data: result })
             }
@@ -80,7 +84,7 @@ export class CategoriesAPIController {
     @UseGuards(AuthGuard)
     async deleteUser(@Req() req: Request, @Res() res: Response, @Next() next: NextFunction, @Param('id') id: string) {
         try {
-            const result = await this.categoryService.delete(String(id))
+            const result = await this.productService.delete(String(id))
             if (result) {
                 return res.status(HttpStatus.OK).json({ statusCode: 200, message: 'Delete success !' })
             }
